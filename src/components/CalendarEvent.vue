@@ -1,8 +1,17 @@
 <script>
+import Store from "../store";
+
 export default {
   name: "CalendarEvent",
   props: {
     event: Object,
+    day: Object,
+  },
+  data() {
+    return {
+      newEventTitle: "",
+      newEventPriority: this.event.priority,
+    };
   },
   computed: {
     priorityDisplayName() {
@@ -16,9 +25,29 @@ export default {
       }
       return "Unbekannte Priorität";
     },
+    alertColor() {
+      return "alert-" + this.event.color;
+    },
   },
-  alertColor() {
-    return "alert-" + this.event.color;
+  methods: {
+    deleteEvent() {
+      Store.mutations.deleteEvent(this.day.id, this.event.title);
+    },
+    editEvent() {
+      Store.mutations.editEvent(this.day.id, this.event.title);
+      this.$nextTick(() => {
+        this.$refs.newEventTitleInput.focus();
+      });
+    },
+    updateEvent() {
+      Store.mutations.updateEvent(this.day.id, this.event.title, {
+        title: this.newEventTitle,
+        priority: this.newEventPriority,
+      });
+    },
+    setNewEventTitle(event) {
+      this.newEventTitle = event.target.value;
+    },
   },
 };
 </script>
@@ -26,18 +55,36 @@ export default {
 <template>
   <div id="calendar-event">
     <div class="alert text-center" :class="alertColor">
-      <div>
-        <slot name="eventPriority"
-          ><strong>{{ priorityDisplayName }}</strong>
+      <template v-if="!event.edit">
+        <div>
+          <slot name="eventPriority" :priorityDisplayName="priorityDisplayName"
+            ><strong>{{ priorityDisplayName }}</strong>
+          </slot>
+        </div>
+        <slot :event="event">
+          <div>{{ event.title }}</div>
         </slot>
-      </div>
-      <slot>
-        <div>{{ event.title }}</div>
-      </slot>
-      <div>
-        <i class="fas fa-edit me-2" role="button"></i>
-        <i class="far fa-trash-alt" role="button"></i>
-      </div>
+        <div>
+          <i class="fas fa-edit me-2" role="button" @click="editEvent()"></i>
+          <i class="far fa-trash-alt" role="button" @click="deleteEvent()"></i>
+        </div>
+      </template>
+      <template v-else>
+        <input
+          type="text"
+          class="form-control"
+          :placeholder="event.title"
+          ref="newEventTitleInput"
+          @input="setNewEventTitle($event)"
+        />
+        <select class="form-select mt-2" v-model="newEventPriority">
+          <option value="-1">Hoch</option>
+          <option value="0">Mittel</option>
+          <option value="1">Niedrig</option>
+        </select>
+        <hr />
+        <i class="fas fa-check" @click="updateEvent" role="button"></i>
+      </template>
     </div>
   </div>
 </template>

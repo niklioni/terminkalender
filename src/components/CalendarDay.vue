@@ -35,6 +35,11 @@ export default {
         : null;
     },
   },
+  methods: {
+    setActiveDay() {
+      Store.mutations.setActiveDay(this.day.id);
+    },
+  },
 };
 </script>
 
@@ -44,6 +49,7 @@ export default {
       class="card-header text-center"
       :class="cardHeaderClasses"
       role="button"
+      @click="setActiveDay"
     >
       <strong>{{ day.fullName }}</strong>
     </div>
@@ -52,10 +58,13 @@ export default {
         v-for="event in day.events"
         :key="event.title"
         :event="event"
+        :day="day"
       >
-        <template v-slot:eventPriority> {{ event.priority }}</template>
+        <template #eventPriority="slotProps">
+          {{ slotProps.priorityDisplayName }}
+        </template>
         <!--        <template v-slot:eventPriority> Priorität </template>-->
-        <!--        <template v-slot>Titel des Events</template>-->
+        <template v-slot="slotProps"> {{ slotProps.event.title }}</template>
       </CalendarEvent>
     </div>
   </div>
