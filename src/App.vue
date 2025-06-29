@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12">
         <!-- Anfang: Template für die Calendar-Week-Component -->
-        <CalendarWeek />
+        <component :is="activeView" />
       </div>
     </div>
     <div class="row mt-3">
@@ -30,13 +30,16 @@
 <script>
 import { defineAsyncComponent } from "vue";
 import CalendarWeek from "@/components/CalendarWeek.vue";
+import CalendarWeekAsList from "@/components/CalendarWeekAsList.vue";
 import CalendarEntry from "@/components/CalendarEntry.vue";
+import Store from "./store";
 // import CalendarSettings from "@/components/CalendarSettings.vue";
 export default {
   name: "App",
   components: {
     CalendarEntry,
     CalendarWeek,
+    CalendarWeekAsList,
     CalendarSettings: defineAsyncComponent(() => {
       return import("./components/CalendarSettings.vue");
     }),
@@ -49,6 +52,9 @@ export default {
   computed: {
     buttonSettingsClasses() {
       return this.displaySettings ? ["btn-sucess"] : ["btn-outline-success"];
+    },
+    activeView() {
+      return Store.getters.activeView();
     },
   },
   methods: {

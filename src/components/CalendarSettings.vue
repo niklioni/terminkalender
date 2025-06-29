@@ -1,6 +1,25 @@
 <script>
+import Store from "../store";
 export default {
   name: "CalendarSettings",
+  data() {
+    return {
+      views: {
+        CalendarWeek: "fas fa-table",
+        CalendarWeekAsList: "fas fa-list",
+      },
+    };
+  },
+  methods: {
+    changeActiveView(componentName) {
+      Store.mutations.setActiveView(componentName);
+    },
+    isActiveView(componentName) {
+      if (Store.state.activeView === componentName) {
+        return ["border border-success"];
+      }
+    },
+  },
 };
 </script>
 
@@ -12,8 +31,18 @@ export default {
       </div>
       <div class="card-body">
         <ul class="nav nav-pills nav-fill">
-          <li v-for="i in 2" :key="i" class="nav-item" role="button">
-            <a class="nav-link"><i class="fas fa-icons text-success"></i></a>
+          <li
+            v-for="(icon, componentName) in views"
+            :key="componentName"
+            class="nav-item"
+            role="button"
+          >
+            <a
+              class="nav-link"
+              :class="isActiveView(componentName)"
+              @click="changeActiveView(componentName)"
+              ><i class="text-success" :class="icon"></i
+            ></a>
           </li>
         </ul>
         <hr />
